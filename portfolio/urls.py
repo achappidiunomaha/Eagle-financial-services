@@ -1,6 +1,7 @@
 # from django.conf.urls import url
 from . import views
 from django.urls import path, re_path
+from django.contrib.auth import views as auth_views
 
 app_name = 'portfolio'
 urlpatterns = [
@@ -21,4 +22,17 @@ urlpatterns = [
     path('investment/create/', views.investment_new, name='investment_new'),
     path('investment/<int:pk>/edit/', views.investment_edit, name='investment_edit'),
     path('investment/<int:pk>/delete/', views.investment_delete, name='investment_delete'),
+
+    path('fund_list', views.fund_list, name='fund_list'),
+    path('fund/create/', views.fund_new, name='fund_new'),
+    path('fund/<int:pk>/edit/', views.fund_edit, name='fund_edit'),
+    path('fund/<int:pk>/delete/', views.fund_delete, name='fund_delete'),
+
+    path('accounts/password_change/',
+         auth_views.PasswordChangeView.as_view(template_name="registration/password_change.html"),
+         name='password_change'),
+    path('accounts/password_change/done/',
+         auth_views.PasswordChangeDoneView.as_view(template_name="registration/password_changed.html"),
+         name='password_changed'),
+
 ]

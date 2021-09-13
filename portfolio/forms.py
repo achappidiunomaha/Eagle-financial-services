@@ -18,3 +18,8 @@ class InvestmentForm(forms.ModelForm):
         model = Investment
         fields = ('customer', 'category', 'description', 'acquired_value', 'acquired_date', 'recent_value',
                   'recent_date',)
+
+class FundForm(forms.ModelForm):
+    class Meta:
+        model = Fund
+        fields = ('customer', 'fund_type', 'fund_amount', 'start_date', 'end_date',)

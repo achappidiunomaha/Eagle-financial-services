@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required
-# from django.shortcuts import render
-from .models import *
-from .forms import *
-from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
+from django.shortcuts import render, get_object_or_404
+
+# from django.shortcuts import render
+from .forms import *
 
 now = timezone.now()
 
@@ -136,3 +136,49 @@ def investment_delete(request, pk):
     investment = get_object_or_404(Investment, pk=pk)
     investment.delete()
     return redirect('portfolio:investment_list')
+
+@login_required
+def fund_new(request):
+    if request.method == "POST":
+        form = FundForm(request.POST)
+        if form.is_valid():
+            fund = form.save(commit=False)
+            fund.created_date = timezone.now()
+            fund.save()
+            fund = Fund.objects.filter(start_date__lte=timezone.now())
+            return render(request, 'portfolio/fund_list.html',
+                          {'funds': fund})
+    else:
+        form = FundForm()
+    return render(request, 'portfolio/fund_new.html', {'form': form})
+
+
+@login_required
+def fund_list(request):
+    funds = Fund.objects.filter(start_date__lte=timezone.now())
+    return render(request, 'portfolio/fund_list.html', {'funds': funds})
+
+
+@login_required
+def fund_edit(request, pk):
+    fund = get_object_or_404(Fund, pk=pk)
+    if request.method == "POST":
+        # update
+        form = FundForm(request.POST, instance=fund)
+        if form.is_valid():
+            fund = form.save()
+            fund.updated_date = timezone.now()
+            fund.save()
+            funds = Fund.objects.filter(start_date__lte=timezone.now())
+            return render(request, 'portfolio/fund_list.html', {'funds': funds})
+    else:
+        # edit
+        form = FundForm(instance=fund)
+    return render(request, 'portfolio/fund_edit.html', {'form': form})
+
+
+@login_required
+def fund_delete(request, pk):
+    fund = get_object_or_404(Fund, pk=pk)
+    fund.delete()
+    return redirect('portfolio:fund_list')

@@ -2,6 +2,15 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+fund_choice = (
+    ('money market funds', 'MONEY MARKET FUNDS'),
+    ('fixed income funds', 'FIXED INCOME FUNDS'),
+    ('equity funds', 'EQUITY FUNDS'),
+    ('balanced funds', 'BALANCED FUNDS'),
+    ('index funds', 'INDEX FUNDS'),
+    ('specialty funds', 'SPECIALTY FUNDS'),
+    ('fund-of-funds', 'FUND-OF-FUNDS'),
+)
 
 # Create your models here.
 class Customer(models.Model):
@@ -70,3 +79,24 @@ class Stock(models.Model):
 
     def initial_stock_value(self):
         return self.shares * self.purchase_price
+
+
+class Fund(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='funds')
+    fund_type = models.CharField(max_length=50, choices=fund_choice, null=False, blank=True)
+    fund_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    start_date = models.DateField(default=timezone.now, blank=True, null=True)
+    end_date = models.DateField(default=timezone.now, blank=True, null=True)
+
+    def created(self):
+        self.start_date = timezone.now()
+        self.save()
+
+    def updated(self):
+        self.end_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return str(self.customer)
+
+
